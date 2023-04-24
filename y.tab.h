@@ -49,29 +49,59 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    PR = 258,
-    NUM = 259,
-    ADD = 260,
-    SUB = 261,
-    MUL = 262,
-    DIV = 263,
-    LPAR = 264,
-    RPAR = 265,
-    NL = 266,
-    DEL = 267
+    NUM = 258,
+    NL = 259,
+    COMMA = 260,
+    SEMICOLON = 261,
+    PLUS = 262,
+    MINUS = 263,
+    MUL = 264,
+    DIV = 265,
+    EXPO = 266,
+    LPAR = 267,
+    RPAR = 268,
+    EQUAL = 269,
+    NOTEQUAL = 270,
+    LESSTHAN = 271,
+    GREATERTHAN = 272,
+    LESSEQUAL = 273,
+    GREATEREQUAL = 274,
+    NOT = 275,
+    AND = 276,
+    OR = 277,
+    XOR = 278,
+    PRINT = 279,
+    REM = 280,
+    END = 281,
+    LET = 282
   };
 #endif
 /* Tokens.  */
-#define PR 258
-#define NUM 259
-#define ADD 260
-#define SUB 261
-#define MUL 262
-#define DIV 263
-#define LPAR 264
-#define RPAR 265
-#define NL 266
-#define DEL 267
+#define NUM 258
+#define NL 259
+#define COMMA 260
+#define SEMICOLON 261
+#define PLUS 262
+#define MINUS 263
+#define MUL 264
+#define DIV 265
+#define EXPO 266
+#define LPAR 267
+#define RPAR 268
+#define EQUAL 269
+#define NOTEQUAL 270
+#define LESSTHAN 271
+#define GREATERTHAN 272
+#define LESSEQUAL 273
+#define GREATEREQUAL 274
+#define NOT 275
+#define AND 276
+#define OR 277
+#define XOR 278
+#define PRINT 279
+#define REM 280
+#define END 281
+#define LET 282
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

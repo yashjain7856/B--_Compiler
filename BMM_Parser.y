@@ -3,7 +3,7 @@
 extern FILE *yyin;
 void yyerror(const char *str)
 {
-	fprintf(stderr,"Invalid String\n");
+	fprintf(stderr,"Invalid String: %s\n", str);
 }
 int yywrap()
 {
@@ -15,35 +15,63 @@ int main()
 	yyparse();
 	return 0;
 }
+int power_cust(int a, int b){
+	int res=1;
+	for(int i=0;i<b;i++){
+		res = res*a;
+	}
+	return res;
+}
+
 int printbuffer[100];
 int printidx = 0;
-
 %}
 
-%token PR NUM ADD SUB MUL DIV LPAR RPAR NL DEL
+%token NUM NL COMMA SEMICOLON
+%token PLUS MINUS MUL DIV EXPO LPAR RPAR 
+%token EQUAL NOTEQUAL LESSTHAN GREATERTHAN LESSEQUAL GREATEREQUAL 
+%token NOT AND OR XOR
+%token PRINT REM END LET
 
 
 %%
-PRI: PR NL
-     |PR EXP1 NL {
-		while(printidx--){
-			printf("%d ", printbuffer[printidx]);
-		}
-		printf("\n");
-	 }
-     |PR EXP2 NL
-	 ;
+PROG: STMTS
+	;
 
-EXP1: EXP {printbuffer[printidx]=$1; printidx++;}
-      | EXP DEL EXP1 {printbuffer[printidx]=$1; printidx++;}
+STMTS: STMT ENDSTMT
+		| STMT STMTS
+		;
+
+ENDSTMT: NUM END {printf("PROGRAM ENDED\n");}
+		;
+
+STMT: PRINT_STMT
+	;
+
+PRINT_STMT: NUM PRINT NL
+     		|NUM PRINT PRINT_EXPR1 NL {
+				while(printidx--){
+					printf("%d ", printbuffer[printidx]);
+				}
+				printf("\n");
+	 		}
+     		|NUM PRINT PRINT_EXPR2 NL
+	 		;
+
+PRINT_EXPR1: NUM_EXP {printbuffer[printidx]=$1; printidx++;}
+      | NUM_EXP DEL PRINT_EXPR1 {printbuffer[printidx]=$1; printidx++;}
 	  ;
 
-EXP2: EXP DEL {$$=$1;}
-     | EXP DEL EXP2 
+PRINT_EXPR2: NUM_EXP DEL {$$=$1;}
+     | NUM_EXP DEL PRINT_EXPR2 
 	 ;
 
-EXP :EXP ADD TERM  	{$$=$1+$3;}
-      |EXP SUB TERM  	{$$=$1-$3;}
+DEL: COMMA
+	| SEMICOLON
+	;
+
+NUM_EXP :NUM_EXP PLUS TERM  	{$$=$1+$3;}
+      |NUM_EXP MINUS TERM  	{$$=$1-$3;}
       |TERM	  	{$$=$1;}
       ;
      
@@ -51,8 +79,14 @@ TERM :TERM MUL FAC	{$$=$1*$3;}
       |TERM DIV FAC	{$$=$1/$3;}
       |FAC		{$$=$1;}
       ;
-     
-FAC:NUM		{$$=$1;}
-        |LPAR EXP RPAR	{$$=$2;}
-       ;
+
+FAC: VAR EXPO VAR {$$=power_cust($1,$3);}
+	| VAR {$$=$1;}
+	;
+
+VAR:NUM		{$$=$1;}
+    |LPAR NUM_EXP RPAR	{$$=$2;}
+    ;
+
+
 %%
