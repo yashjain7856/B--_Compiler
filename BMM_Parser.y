@@ -15,78 +15,167 @@ int main()
 	yyparse();
 	return 0;
 }
-int power_cust(int a, int b){
-	int res=1;
-	for(int i=0;i<b;i++){
-		res = res*a;
-	}
-	return res;
-}
 
-int printbuffer[100];
-int printidx = 0;
 %}
 
 %token NUM NL COMMA SEMICOLON
 %token PLUS MINUS MUL DIV EXPO LPAR RPAR 
 %token EQUAL NOTEQUAL LESSTHAN GREATERTHAN LESSEQUAL GREATEREQUAL 
 %token NOT AND OR XOR
-%token PRINT REM END LET
-
+%token DATA DEF DIM END FOR TO STEP NEXT GOSUB GOTO IF THEN LET INPUT PRINT REM RETURN STOP
+%token STRING_LITERAL AR_VARNAME VARNAME
 
 %%
 PROG: STMTS
 	;
 
-STMTS: STMT ENDSTMT
-		| STMT STMTS
+STMTS: NUM STMT NL ENDSTMT
+		| NUM STMT NL STMTS
 		;
 
-ENDSTMT: NUM END {printf("PROGRAM ENDED\n");}
+ENDSTMT: NUM END
 		;
 
 STMT: PRINT_STMT
+	| IF_STMT
+	| FOR_STMT
+	| DIM_STMT
+	| GOTO_STMT
+	| GOSUB_STMT
+	| RETURN_STMT
+	| STOP_STMT
 	;
 
-PRINT_STMT: NUM PRINT NL
-     		|NUM PRINT PRINT_EXPR1 NL {
-				while(printidx--){
-					printf("%d ", printbuffer[printidx]);
-				}
-				printf("\n");
-	 		}
-     		|NUM PRINT PRINT_EXPR2 NL
+/* IF Statement */
+IF_STMT: IF CONDITION THEN NUM
+		;
+
+CONDITION: NUM_EXP RELOP NUM_EXP
+			| STRING_LITERAL EQUAL STRING_LITERAL
+			| STRING_LITERAL NOTEQUAL STRING_LITERAL
+			;
+
+RELOP: LESSTHAN
+		| LESSEQUAL
+		| EQUAL
+		| GREATEREQUAL
+		| GREATERTHAN
+		| NOTEQUAL
+		;
+
+/* RETURN and STOP */
+RETURN_STMT: RETURN
+			;
+
+STOP_STMT: STOP
+		;
+
+/* GOTO and GOSUB */
+GOTO_STMT: GOTO NUM
+		;
+
+GOSUB_STMT: GOSUB NUM
+			;
+
+/* DIM Statement */
+DIM_STMT: DIM DECLARATIONS
+		;
+
+DECLARATIONS: DECL_STMT
+			| DECL_STMT COMMA DECLARATIONS
+			;
+
+DECL_STMT: AR_VARNAME MAX_SUB RPAR
+		;
+
+MAX_SUB: NUM
+		| NUM COMMA NUM
+		;
+
+/* FOR Statement */
+FOR_STMT: FOR_HEADER NL FOR_INNER_STMTS
+		;
+
+FOR_HEADER: FOR VARNAME EQUAL NUM_EXP TO NUM_EXP STEP NUM_EXP
+			| FOR VARNAME EQUAL NUM_EXP TO NUM_EXP
+			;
+
+FOR_INNER_STMTS: NUM STMT NL NUM NEXT VARNAME
+			| NUM STMT NL FOR_INNER_STMTS
+
+/* Print Statement */
+PRINT_STMT: PRINT
+     		|PRINT PRINT_EXPR1 
+     		|PRINT PRINT_EXPR2
 	 		;
 
-PRINT_EXPR1: NUM_EXP {printbuffer[printidx]=$1; printidx++;}
-      | NUM_EXP DEL PRINT_EXPR1 {printbuffer[printidx]=$1; printidx++;}
+PRINT_EXPR1: PRINT_EXPR
+      | PRINT_EXPR DEL PRINT_EXPR1
 	  ;
 
-PRINT_EXPR2: NUM_EXP DEL {$$=$1;}
-     | NUM_EXP DEL PRINT_EXPR2 
+PRINT_EXPR2: PRINT_EXPR DEL
+     | PRINT_EXPR DEL PRINT_EXPR2 
 	 ;
+
+PRINT_EXPR: NUM_EXP
+			|STRING_LITERAL
+			;
 
 DEL: COMMA
 	| SEMICOLON
 	;
 
-NUM_EXP :NUM_EXP PLUS TERM  	{$$=$1+$3;}
-      |NUM_EXP MINUS TERM  	{$$=$1-$3;}
-      |TERM	  	{$$=$1;}
+
+/* For Arithmetic Operations */
+NUM_EXP :NUM_EXP PLUS AA
+      |NUM_EXP MINUS AA
+      |AA
       ;
      
-TERM :TERM MUL FAC	{$$=$1*$3;}
-      |TERM DIV FAC	{$$=$1/$3;}
-      |FAC		{$$=$1;}
+AA :AA MUL BB
+      |AA DIV BB
+      |BB
       ;
 
-FAC: VAR EXPO VAR {$$=power_cust($1,$3);}
-	| VAR {$$=$1;}
+BB: MINUS BB
+	|CC
 	;
 
-VAR:NUM		{$$=$1;}
-    |LPAR NUM_EXP RPAR	{$$=$2;}
+CC: CC EXPO DD
+	|DD
+	;
+
+DD:NUM
+    |LPAR NUM_EXP RPAR
     ;
+
+/* For Relational Operations */
+/* REL_EXP :REL_EXP GREATEREQUAL R_AA
+      |R_AA
+      ;
+     
+R_AA :R_AA LESSEQUAL R_BB
+      |R_BB
+      ;
+
+R_BB: R_BB GREATERTHAN R_CC
+	| R_CC
+	;
+
+R_CC: R_CC LESSTHAN R_DD
+	| R_DD
+	;
+
+R_DD: R_DD NOTEQUAL R_EE
+	| R_EE
+	;
+
+R_EE: R_EE EQUAL R_FF
+	| R_FF
+	;
+
+R_FF: NUM
+	; */
 
 
 %%

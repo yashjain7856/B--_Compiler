@@ -70,10 +70,27 @@ extern int yydebug;
     AND = 276,
     OR = 277,
     XOR = 278,
-    PRINT = 279,
-    REM = 280,
-    END = 281,
-    LET = 282
+    DATA = 279,
+    DEF = 280,
+    DIM = 281,
+    END = 282,
+    FOR = 283,
+    TO = 284,
+    STEP = 285,
+    NEXT = 286,
+    GOSUB = 287,
+    GOTO = 288,
+    IF = 289,
+    THEN = 290,
+    LET = 291,
+    INPUT = 292,
+    PRINT = 293,
+    REM = 294,
+    RETURN = 295,
+    STOP = 296,
+    STRING_LITERAL = 297,
+    AR_VARNAME = 298,
+    VARNAME = 299
   };
 #endif
 /* Tokens.  */
@@ -98,10 +115,27 @@ extern int yydebug;
 #define AND 276
 #define OR 277
 #define XOR 278
-#define PRINT 279
-#define REM 280
-#define END 281
-#define LET 282
+#define DATA 279
+#define DEF 280
+#define DIM 281
+#define END 282
+#define FOR 283
+#define TO 284
+#define STEP 285
+#define NEXT 286
+#define GOSUB 287
+#define GOTO 288
+#define IF 289
+#define THEN 290
+#define LET 291
+#define INPUT 292
+#define PRINT 293
+#define REM 294
+#define RETURN 295
+#define STOP 296
+#define STRING_LITERAL 297
+#define AR_VARNAME 298
+#define VARNAME 299
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
