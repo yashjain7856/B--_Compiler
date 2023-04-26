@@ -54,8 +54,9 @@ XOR {printf("XOR FOUND\n"); return XOR;}
 
     /*Variables and Literals */
 \"[^\"]*\" {printf("STRING_LITERAL FOUND\n"); return STRING_LITERAL;}
-[A-Z][0-9]?[%!#$]? {printf("VARNAME FOUND\n"); return VARNAME;}
+[A-Z][0-9]?\$ {printf("STRING_VARNAME FOUND\n"); return STRING_VARNAME;}
 [A-Z]\( {printf("AR_VARNAME FOUND\n"); return AR_VARNAME;}
+[A-Z][0-9]?[%!#]? {printf("VARNAME FOUND\n"); return VARNAME;}
 
     /* Special Characters */
 , {printf("COMMA FOUND\n"); return COMMA;}
