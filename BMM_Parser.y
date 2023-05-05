@@ -1,6 +1,6 @@
 %{
 #include <stdio.h>
-extern FILE *yyin, *yyout;
+
 void yyerror(const char *str)
 {
 	fprintf(stderr,"Invalid String: %s\n", str);
@@ -9,9 +9,10 @@ int yywrap()
 {
 	return 1;
 }
-int main()
+int main(int argc, char* argv[])
 {
-	yyin = fopen("in.txt","r");
+	extern FILE *yyin, *yyout;
+	yyin = fopen(argv[1],"r");
 	yyout = fopen("out.txt","w");
 	yyparse();
 	return 0;

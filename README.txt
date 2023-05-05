@@ -22,14 +22,12 @@ INSTRUCTIONS TO EXECUTE THE PROGRAM:
 Provide the input in the file "in.txt" and the output would be generated in the file "out.txt".
 
 
-IF YOU WANT TO USE OTHER FILES FOR INPUT:
-Change the filename from in.txt to the new filename in the line 14 of BMM_Parser.y
-
 COMMANDS TO EXECUTE:
 IN LINUX / BASH, PUT THE FOLLOWING COMMAND AND PRESS ENTER:
-lex BMM_Scanner.l ; yacc -d BMM_Parser.y ; cc lex.yy.c y.tab.c -o BMM ; ./BMM
+lex BMM_Scanner.l ; yacc -d BMM_Parser.y ; cc lex.yy.c y.tab.c -o BMM ; ./BMM in.txt
 
-
+IF YOU WANT TO USE OTHER FILES FOR INPUT:
+Change the filename from in.txt to the new filename at the end of the above command.
 
 
 ---------------------------------------------------
