@@ -10,25 +10,26 @@
 [0-9]+ {yylval=atoi(yytext); fprintf(yyout, "NUM FOUND: %d\n",yylval); return NUM;}
 
     /* Statement Type */
-DATA {fprintf(yyout, "DATA FOUND\n"); return DATA;}
-DEF {fprintf(yyout, "DEF FOUND\n"); return DEF;}
+[ ]DATA[ ] {fprintf(yyout, "DATA FOUND\n"); return DATA;}
+[ ]DEF[ ] {fprintf(yyout, "DEF FOUND\n"); return DEF;}
 FN {fprintf(yyout, "FN FOUND\n"); return FN;}
-DIM {fprintf(yyout, "DIM FOUND\n"); return DIM;}
-END {fprintf(yyout, "END FOUND\n"); return END;}
-FOR {fprintf(yyout, "FOR FOUND\n"); return FOR;}
-TO {fprintf(yyout, "TO FOUND\n"); return TO;}
-STEP {fprintf(yyout, "STEP FOUND\n"); return STEP;}
-NEXT {fprintf(yyout, "NEXT FOUND\n"); return NEXT;}
-GOSUB {fprintf(yyout, "GOSUB FOUND\n"); return GOSUB;}
-GOTO {fprintf(yyout, "GOTO FOUND\n"); return GOTO;}
-IF {fprintf(yyout, "IF FOUND\n"); return IF;}
-THEN {fprintf(yyout, "THEN FOUND\n"); return THEN;}
-LET {fprintf(yyout, "LET FOUND\n"); return LET;}
-INPUT {fprintf(yyout, "INPUT FOUND\n"); return INPUT;}
-PRINT {fprintf(yyout, "PRINT FOUND\n");return PRINT;}
-REM.* {fprintf(yyout, "REM FOUND\n"); return REM;}
-RETURN {fprintf(yyout, "RETURN FOUND\n"); return RETURN;}
-STOP {fprintf(yyout, "STOP FOUND\n"); return STOP;}
+[ ]DIM[ ] {fprintf(yyout, "DIM FOUND\n"); return DIM;}
+[ ]END {fprintf(yyout, "END FOUND\n"); return END;}
+[ ]FOR[ ] {fprintf(yyout, "FOR FOUND\n"); return FOR;}
+[ ]TO[ ] {fprintf(yyout, "TO FOUND\n"); return TO;}
+[ ]STEP[ ] {fprintf(yyout, "STEP FOUND\n"); return STEP;}
+[ ]NEXT[ ] {fprintf(yyout, "NEXT FOUND\n"); return NEXT;}
+[ ]GOSUB[ ] {fprintf(yyout, "GOSUB FOUND\n"); return GOSUB;}
+[ ]GOTO[ ] {fprintf(yyout, "GOTO FOUND\n"); return GOTO;}
+[ ]IF[ ] {fprintf(yyout, "IF FOUND\n"); return IF;}
+[ ]THEN[ ] {fprintf(yyout, "THEN FOUND\n"); return THEN;}
+[ ]LET[ ] {fprintf(yyout, "LET FOUND\n"); return LET;}
+[ ]INPUT[ ] {fprintf(yyout, "INPUT FOUND\n"); return INPUT;}
+[ ]PRINT[ ] {fprintf(yyout, "PRINT FOUND\n");return PRINT;}
+[ ]REM[ ].* {fprintf(yyout, "REM FOUND\n"); return REM;}
+[ ]REM {fprintf(yyout, "REM FOUND\n"); return REM;}
+[ ]RETURN {fprintf(yyout, "RETURN FOUND\n"); return RETURN;}
+[ ]STOP {fprintf(yyout, "STOP FOUND\n"); return STOP;}
 
     /* Arithmetic Operators */
 \( {fprintf(yyout, "LPAR FOUND\n"); return LPAR;}
@@ -74,5 +75,10 @@ XOR {fprintf(yyout, "XOR FOUND\n"); return XOR;}
 , {fprintf(yyout, "COMMA FOUND\n"); return COMMA;}
 ; {fprintf(yyout, "SEMICOLON FOUND\n"); return SEMICOLON;}
 \n {fprintf(yyout, "NEWLINE FOUND\n"); return NL;}
+
+    /* Characters NOT ALLOWED */
+\t {fprintf(yyout, "TAB FOUND, NOT ALLOWED !!!\n");}
+[a-z] {fprintf(yyout, "LOWERCASE LETTER FOUND, NOT ALLOWED !!!\n");}
+
 [ ]+          /* do nothing */
 %%
