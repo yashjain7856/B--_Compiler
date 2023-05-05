@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+extern FILE *yyin, *yyout;
 
 void yyerror(const char *str)
 {
@@ -9,12 +10,84 @@ int yywrap()
 {
 	return 1;
 }
+
+int lineNumber[1000] = {0};
+int numLines = 0;
+
+int ifLines[1000] = {0};
+int numifs = 0;
+
+int gotoLines[1000] = {0};
+int numgotos = 0;
+
+int gosubLines[1000] = {0};
+int numgosubs = 0;
+
+void pushLine(int a){
+	lineNumber[numLines]=a; 
+	numLines++;
+}
+
+void tmp(int a, int b){
+	if(a>=b){
+		printf("invalid sequence of line numbers: %d and %d\n",a,b);
+	}
+}
+
+void checkifs(){
+	for(int i=0;i<numifs;i++){
+		int flag=0;
+		for(int j=0;j<numLines;j++){
+			if(ifLines[i]==lineNumber[j]){
+				flag=1;
+				break;
+			}
+		}
+		if(flag==0){
+			fprintf(yyout,"Line number %d called in IF statement NOT found !!!\n",ifLines[i]);
+		}
+	}
+}
+
+void checkgotos(){
+	for(int i=0;i<numgotos;i++){
+		int flag=0;
+		for(int j=0;j<numLines;j++){
+			if(gotoLines[i]==lineNumber[j]){
+				flag=1;
+				break;
+			}
+		}
+		if(flag==0){
+			fprintf(yyout,"Line number %d called in GOTO statement NOT found !!!\n",gotoLines[i]);
+		}
+	}
+}
+
+
+void checkgosubs(){
+	for(int i=0;i<numgosubs;i++){
+		int flag=0;
+		for(int j=0;j<numLines;j++){
+			if(gosubLines[i]==lineNumber[j]){
+				flag=1;
+				break;
+			}
+		}
+		if(flag==0){
+			fprintf(yyout,"Line number %d called in GOSUB statement NOT found !!!\n",gosubLines[i]);
+		}
+	}
+}
+
 int main(int argc, char* argv[])
 {
-	extern FILE *yyin, *yyout;
 	yyin = fopen(argv[1],"r");
 	yyout = fopen("out.txt","w");
 	yyparse();
+	checkifs();
+	checkgosubs();
+	checkgotos();
 	return 0;
 }
 
@@ -31,26 +104,26 @@ int main(int argc, char* argv[])
 PROG: STMTS
 	;
 
-STMTS: NUM STMT NL END_STMT
-		| NUM STMT NL STMTS
+STMTS: STMT END_STMT {tmp($1, $2); $$=$1; pushLine($1);}
+		| STMT STMTS {tmp($1, $2); pushLine($1);}
 		;
 
-END_STMT: NUM END
+END_STMT: NUM END {$$=$1; pushLine($1);}
 		;
 
-STMT: DATA_STMT
-	| DEF_STMT
-	| DIM_STMT
-	| FOR_STMT
-	| GOSUB_STMT
-	| GOTO_STMT
-	| IF_STMT
-	| LET_STMT
-	| INPUT_STMT
-	| PRINT_STMT
-	| REM_STMT
-	| RETURN_STMT
-	| STOP_STMT
+STMT: NUM DATA_STMT NL {$$=$1;} 
+	| NUM DEF_STMT NL {$$=$1;}
+	| NUM DIM_STMT NL {$$=$1;}
+	| NUM FOR_STMT NL {tmp($1, $2); $$=$1;}
+	| NUM GOSUB_STMT NL {$$=$1;}
+	| NUM GOTO_STMT NL {$$=$1;}
+	| NUM IF_STMT NL {$$=$1;}
+	| NUM LET_STMT NL {$$=$1;}
+	| NUM INPUT_STMT NL {$$=$1;}
+	| NUM PRINT_STMT NL {$$=$1;}
+	| NUM REM_STMT NL {$$=$1;}
+	| NUM RETURN_STMT NL {$$=$1;}
+	| NUM STOP_STMT NL {$$=$1;}
 	;
 
 /* DATA Statement */
@@ -88,15 +161,15 @@ MAX_SUB: NUM
 		;
 
 /* FOR Statement */
-FOR_STMT: FOR_HEADER NL FOR_INNER_STMTS
+FOR_STMT: FOR_HEADER NL FOR_INNER_STMTS {$$=$3;}
 		;
 
 FOR_HEADER: FOR NUMERIC_VAR EQUAL NUM_EXP TO NUM_EXP STEP NUM_EXP
 			| FOR NUMERIC_VAR EQUAL NUM_EXP TO NUM_EXP
 			;
 
-FOR_INNER_STMTS: NUM STMT NL NUM NEXT NUMERIC_VAR
-			| NUM STMT NL FOR_INNER_STMTS
+FOR_INNER_STMTS: STMT NUM NEXT NUMERIC_VAR {tmp($1, $2); $$=$1; pushLine($2); pushLine($1); }
+			| STMT FOR_INNER_STMTS {tmp($1, $2); $$=$1; pushLine($1);}
 			;
 
 WHOLE_VAR: INT_VAR
@@ -117,14 +190,14 @@ ARRAY_ELEMENT: LETTER LPAR NUM RPAR
 				;
 
 /* GOSUB and GOTO */
-GOSUB_STMT: GOSUB NUM
+GOSUB_STMT: GOSUB NUM {gosubLines[numgosubs]=$2; numgosubs++;}
 			;
 
-GOTO_STMT: GOTO NUM
+GOTO_STMT: GOTO NUM {gotoLines[numgotos]=$2; numgotos++;}
 		;
 
 /* IF Statement */
-IF_STMT: IF CONDITION THEN NUM
+IF_STMT: IF CONDITION THEN NUM {ifLines[numifs]=$4; numifs++;}
 		;
 
 CONDITION: NUM_EXP RELOP NUM_EXP
