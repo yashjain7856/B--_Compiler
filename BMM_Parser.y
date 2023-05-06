@@ -1,41 +1,43 @@
 %{
 #include <stdio.h>
+#define MAXLINES 1000
+
 extern FILE *yyin, *yyout;
 
 void yyerror(const char *str)
 {
-	fprintf(stderr,"Invalid String: %s\n", str);
+	fprintf(yyout,"Invalid String: %s, Parsing stopped until new line.\n", str);
 }
 int yywrap()
 {
 	return 1;
 }
 
-int lineNumber[1000] = {0};
+int lineNumber[MAXLINES] = {0};
 int numLines = 0;
 
-int ifLines[1000] = {0};
-int numifs = 0;
+int ifLines[MAXLINES] = {0};
+int numIfs = 0;
 
-int gotoLines[1000] = {0};
-int numgotos = 0;
+int gotoLines[MAXLINES] = {0};
+int numGotos = 0;
 
-int gosubLines[1000] = {0};
-int numgosubs = 0;
+int gosubLines[MAXLINES] = {0};
+int numGosubs = 0;
 
 void pushLine(int a){
 	lineNumber[numLines]=a; 
 	numLines++;
 }
 
-void tmp(int a, int b){
+void lineCmp(int a, int b){
 	if(a>=b){
-		printf("invalid sequence of line numbers: %d and %d\n",a,b);
+		fprintf(yyout, "Invalid sequence of line numbers: %d and %d\n",a,b);
 	}
 }
 
 void checkifs(){
-	for(int i=0;i<numifs;i++){
+	for(int i=0;i<numIfs;i++){
 		int flag=0;
 		for(int j=0;j<numLines;j++){
 			if(ifLines[i]==lineNumber[j]){
@@ -50,7 +52,7 @@ void checkifs(){
 }
 
 void checkgotos(){
-	for(int i=0;i<numgotos;i++){
+	for(int i=0;i<numGotos;i++){
 		int flag=0;
 		for(int j=0;j<numLines;j++){
 			if(gotoLines[i]==lineNumber[j]){
@@ -66,7 +68,7 @@ void checkgotos(){
 
 
 void checkgosubs(){
-	for(int i=0;i<numgosubs;i++){
+	for(int i=0;i<numGosubs;i++){
 		int flag=0;
 		for(int j=0;j<numLines;j++){
 			if(gosubLines[i]==lineNumber[j]){
@@ -80,14 +82,41 @@ void checkgosubs(){
 	}
 }
 
+int gosubReturnMapping[MAXLINES] = {0};
+int gosubReturnLen = 0;
+
+void mapReturns(int num){
+	int flag=0;
+	for(int i=0;i<gosubReturnLen;i++){
+		
+		if(gosubReturnMapping[i]<=num && gosubReturnMapping[i]!=-1){
+			flag=1;
+			gosubReturnMapping[i]=-1;
+		}
+	}
+	if(flag==0){
+		printf("RETURN statement at line number %d has no corresponding GOSUB statement.\n",num);
+	}
+}
+
+void checkRemGosubs(){
+	for(int i=0;i<gosubReturnLen;i++){
+		if(gosubReturnMapping[i]!=-1){
+			printf("Subroutine at line number %d has no corresponding RETURN statement.\n",gosubReturnMapping[i]);
+		}
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	yyin = fopen(argv[1],"r");
 	yyout = fopen("out.txt","w");
+	fprintf(yyout,"---------------------------PARSING STARTED------------------------------\n");
 	yyparse();
 	checkifs();
 	checkgosubs();
 	checkgotos();
+	checkRemGosubs();
 	return 0;
 }
 
@@ -104,8 +133,8 @@ int main(int argc, char* argv[])
 PROG: STMTS
 	;
 
-STMTS: STMT END_STMT {tmp($1, $2); $$=$1; pushLine($1);}
-		| STMT STMTS {tmp($1, $2); pushLine($1);}
+STMTS: STMT END_STMT {lineCmp($1, $2); $$=$1; pushLine($1);}
+		| STMT STMTS {lineCmp($1, $2); pushLine($1);}
 		;
 
 END_STMT: NUM END {$$=$1; pushLine($1);}
@@ -114,7 +143,7 @@ END_STMT: NUM END {$$=$1; pushLine($1);}
 STMT: NUM DATA_STMT NL {$$=$1;} 
 	| NUM DEF_STMT NL {$$=$1;}
 	| NUM DIM_STMT NL {$$=$1;}
-	| NUM FOR_STMT NL {tmp($1, $2); $$=$1;}
+	| NUM FOR_STMT NL {lineCmp($1, $2); $$=$1;}
 	| NUM GOSUB_STMT NL {$$=$1;}
 	| NUM GOTO_STMT NL {$$=$1;}
 	| NUM IF_STMT NL {$$=$1;}
@@ -122,8 +151,9 @@ STMT: NUM DATA_STMT NL {$$=$1;}
 	| NUM INPUT_STMT NL {$$=$1;}
 	| NUM PRINT_STMT NL {$$=$1;}
 	| NUM REM_STMT NL {$$=$1;}
-	| NUM RETURN_STMT NL {$$=$1;}
+	| NUM RETURN_STMT NL {$$=$1; mapReturns($1);}
 	| NUM STOP_STMT NL {$$=$1;}
+	| error NL {fprintf(yyout,"INVALID INPUT SEQUENCE COMPLETED, PARSING RESUMED AFTER THIS\n");}
 	;
 
 /* DATA Statement */
@@ -168,8 +198,8 @@ FOR_HEADER: FOR NUMERIC_VAR EQUAL NUM_EXP TO NUM_EXP STEP NUM_EXP
 			| FOR NUMERIC_VAR EQUAL NUM_EXP TO NUM_EXP
 			;
 
-FOR_INNER_STMTS: STMT NUM NEXT NUMERIC_VAR {tmp($1, $2); $$=$1; pushLine($2); pushLine($1); }
-			| STMT FOR_INNER_STMTS {tmp($1, $2); $$=$1; pushLine($1);}
+FOR_INNER_STMTS: STMT NUM NEXT NUMERIC_VAR {lineCmp($1, $2); $$=$1; pushLine($2); pushLine($1); }
+			| STMT FOR_INNER_STMTS {lineCmp($1, $2); $$=$1; pushLine($1);}
 			;
 
 WHOLE_VAR: INT_VAR
@@ -190,14 +220,14 @@ ARRAY_ELEMENT: LETTER LPAR NUM RPAR
 				;
 
 /* GOSUB and GOTO */
-GOSUB_STMT: GOSUB NUM {gosubLines[numgosubs]=$2; numgosubs++;}
+GOSUB_STMT: GOSUB NUM {gosubLines[numGosubs]=$2; numGosubs++; gosubReturnMapping[gosubReturnLen]=$2; gosubReturnLen++;}
 			;
 
-GOTO_STMT: GOTO NUM {gotoLines[numgotos]=$2; numgotos++;}
+GOTO_STMT: GOTO NUM {gotoLines[numGotos]=$2; numGotos++;}
 		;
 
 /* IF Statement */
-IF_STMT: IF CONDITION THEN NUM {ifLines[numifs]=$4; numifs++;}
+IF_STMT: IF CONDITION THEN NUM {ifLines[numIfs]=$4; numIfs++;}
 		;
 
 CONDITION: NUM_EXP RELOP NUM_EXP

@@ -26,7 +26,7 @@ FN {fprintf(yyout, "FN FOUND\n"); return FN;}
 [ ]LET[ ] {fprintf(yyout, "LET FOUND\n"); return LET;}
 [ ]INPUT[ ] {fprintf(yyout, "INPUT FOUND\n"); return INPUT;}
 [ ]PRINT[ ] {fprintf(yyout, "PRINT FOUND\n");return PRINT;}
-[ ]REM[ ].* {fprintf(yyout, "REM FOUND\n"); return REM;}
+[ ]REM[ ][^a-z\n]* {fprintf(yyout, "REM FOUND\n"); return REM;}
 [ ]REM {fprintf(yyout, "REM FOUND\n"); return REM;}
 [ ]RETURN {fprintf(yyout, "RETURN FOUND\n"); return RETURN;}
 [ ]STOP {fprintf(yyout, "STOP FOUND\n"); return STOP;}
