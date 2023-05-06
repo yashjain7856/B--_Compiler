@@ -1,6 +1,6 @@
 %{
 #include <stdio.h>
-#define MAXLINES 1000
+#define MAXLINES 10000
 
 extern FILE *yyin, *yyout;
 
@@ -117,6 +117,7 @@ int main(int argc, char* argv[])
 	checkgosubs();
 	checkgotos();
 	checkRemGosubs();
+	fprintf(yyout,"---------------------------PARSING COMPLETED FOR FILENAME \"%s\"------------------------------\n",argv[1]);
 	return 0;
 }
 
