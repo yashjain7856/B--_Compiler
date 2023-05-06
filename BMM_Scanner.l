@@ -77,8 +77,8 @@ XOR {fprintf(yyout, "XOR FOUND\n"); return XOR;}
 \n {fprintf(yyout, "NEWLINE FOUND\n"); return NL;}
 
     /* Characters NOT ALLOWED */
-\t {fprintf(yyout, "TAB FOUND, NOT ALLOWED !!!\n");}
-[a-z] {fprintf(yyout, "LOWERCASE LETTER FOUND, NOT ALLOWED !!!\n");}
+\t {fprintf(yyout, "ERROR: TAB FOUND, NOT ALLOWED !!!\n");}
+[a-z] {fprintf(yyout, "ERROR: LOWERCASE LETTER FOUND, NOT ALLOWED !!!\n");}
 
 [ ]+          /* do nothing */
 %%

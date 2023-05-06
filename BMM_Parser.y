@@ -6,7 +6,7 @@ extern FILE *yyin, *yyout;
 
 void yyerror(const char *str)
 {
-	fprintf(yyout,"Invalid String: %s, Parsing stopped until new line.\n", str);
+	fprintf(yyout,"==========INVALID STRING: %s, PARSING STOPPED UNTIL NEW LINE==========\n", str);
 }
 int yywrap()
 {
@@ -32,7 +32,7 @@ void pushLine(int a){
 
 void lineCmp(int a, int b){
 	if(a>=b){
-		fprintf(yyout, "Invalid sequence of line numbers: %d and %d\n",a,b);
+		fprintf(yyout, "ERROR: INVALID SEQUENCE OF LINE NUMBERS: %d AND %d !!!\n",a,b);
 	}
 }
 
@@ -46,7 +46,7 @@ void checkifs(){
 			}
 		}
 		if(flag==0){
-			fprintf(yyout,"Line number %d called in IF statement NOT found !!!\n",ifLines[i]);
+			fprintf(yyout,"ERROR: LINE NUMBER %d CALLED IN IF STATEMENT NOT FOUND !!!\n",ifLines[i]);
 		}
 	}
 }
@@ -61,7 +61,7 @@ void checkgotos(){
 			}
 		}
 		if(flag==0){
-			fprintf(yyout,"Line number %d called in GOTO statement NOT found !!!\n",gotoLines[i]);
+			fprintf(yyout,"ERROR: LINE NUMBER %d CALLED IN GOTO STATEMENT NOT FOUND !!!\n",gotoLines[i]);
 		}
 	}
 }
@@ -77,7 +77,7 @@ void checkgosubs(){
 			}
 		}
 		if(flag==0){
-			fprintf(yyout,"Line number %d called in GOSUB statement NOT found !!!\n",gosubLines[i]);
+			fprintf(yyout,"ERROR: LINE NUMBER %d CALLED IN GOSUB STATEMENT NOT FOUND !!!\n",gosubLines[i]);
 		}
 	}
 }
@@ -95,14 +95,14 @@ void mapReturns(int num){
 		}
 	}
 	if(flag==0){
-		printf("RETURN statement at line number %d has no corresponding GOSUB statement.\n",num);
+		fprintf(yyout,"ERROR: RETURN STATEMENT AT LINE NUMBER %d HAS NO CORRESPONDING GOSUB STATEMENT !!!\n",num);
 	}
 }
 
 void checkRemGosubs(){
 	for(int i=0;i<gosubReturnLen;i++){
 		if(gosubReturnMapping[i]!=-1){
-			printf("Subroutine at line number %d has no corresponding RETURN statement.\n",gosubReturnMapping[i]);
+			fprintf(yyout,"ERROR: SUBROUTINE AT LINE NUMBER %d HAS NO CORRESPONDING RETURN STATEMENT !!!\n",gosubReturnMapping[i]);
 		}
 	}
 }
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 {
 	yyin = fopen(argv[1],"r");
 	yyout = fopen("out.txt","w");
-	fprintf(yyout,"---------------------------PARSING STARTED------------------------------\n");
+	fprintf(yyout,"---------------------------PARSING STARTED FOR FILENAME \"%s\"------------------------------\n",argv[1]);
 	yyparse();
 	checkifs();
 	checkgosubs();
@@ -153,7 +153,7 @@ STMT: NUM DATA_STMT NL {$$=$1;}
 	| NUM REM_STMT NL {$$=$1;}
 	| NUM RETURN_STMT NL {$$=$1; mapReturns($1);}
 	| NUM STOP_STMT NL {$$=$1;}
-	| error NL {fprintf(yyout,"INVALID INPUT SEQUENCE COMPLETED, PARSING RESUMED AFTER THIS\n");}
+	| error NL {fprintf(yyout,"==========INVALID INPUT SEQUENCE COMPLETED, PARSING RESUMED AFTER THIS==========\n");}
 	;
 
 /* DATA Statement */
