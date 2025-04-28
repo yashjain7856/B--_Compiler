@@ -19,13 +19,21 @@ A compiler for a simple language B-- from scratch
 ### FOLDER STRUCTURE
 ---
 \*
+
 |-BMM_Scanner.l
+
 |-BMM_Parser.y
+
 |-in.txt
+
 |-out.txt
+
 |-CorrectSample.bmm (Sample BMM source code with no errors)
+
 |-IncorrectSample.bmm (Sample BMM source code with errors)
+
 |-Final Project v2.0.pdf
+
 |-README.txt
 
 ### INSTRUCTIONS TO EXECUTE THE PROGRAM
@@ -34,14 +42,16 @@ Provide the input in the file "in.txt" and the output would be generated in the 
 
 #### COMMANDS TO EXECUTE:
 **IN LINUX / BASH, PUT THE FOLLOWING COMMAND AND PRESS ENTER:**
-lex BMM_Scanner.l ; yacc -d BMM_Parser.y ; cc lex.yy.c y.tab.c -o BMM ; ./BMM in.txt
+
+```lex BMM_Scanner.l ; yacc -d BMM_Parser.y ; cc lex.yy.c y.tab.c -o BMM ; ./BMM in.txt```
 
 **IF YOU WANT TO USE OTHER FILES FOR INPUT:**
 Change the filename from in.txt to the new filename at the end of the above command.
 For Example:-
-lex BMM_Scanner.l ; yacc -d BMM_Parser.y ; cc lex.yy.c y.tab.c -o BMM ; ./BMM CorrectSample.bmm
 
-lex BMM_Scanner.l ; yacc -d BMM_Parser.y ; cc lex.yy.c y.tab.c -o BMM ; ./BMM IncorrectSample.bmm
+```lex BMM_Scanner.l ; yacc -d BMM_Parser.y ; cc lex.yy.c y.tab.c -o BMM ; ./BMM CorrectSample.bmm```
+
+```lex BMM_Scanner.l ; yacc -d BMM_Parser.y ; cc lex.yy.c y.tab.c -o BMM ; ./BMM IncorrectSample.bmm```
 
 
 - The statements and commands described for B-- were implemented. 
