@@ -9,6 +9,13 @@ ENTRY NUMBER: 2019EEB1208
 NAME: RIYA
 ENTRY NUMBER: 2019EEB1185
 
+### INTRODUCTION
+---
+
+A compiler for a simple language B-- from scratch
+1. Flex & Bison are used to generate lexical analyser (or scanner) and syntax analyser (or parser) that can recognize source of code of programming language B--.
+2. Meaningful error messages are generated to identify various errors in the syntax of provided sample source codes of B--.
+
 ### FOLDER STRUCTURE
 ---
 \*
@@ -55,10 +62,3 @@ The following errors have been handled and different error messages added to the
 Some of the errors are printed inline, while others are printed at the end of the output (after parsing is done).
 
 For the errors detected, the parsing is stopped for the corresponding line and it resumes execution from the next line.
-
-INTRODUCTION
----
-
-A compiler for a simple language B-- from scratch
-1. Flex & Bison are used to generate lexical analyser (or scanner) and syntax analyser (or parser) that can recognize source of code of programming language B--.
-2. Meaningful error messages are generated to identify various errors in the syntax of provided sample source codes of B--.
